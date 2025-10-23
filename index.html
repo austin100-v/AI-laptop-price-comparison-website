@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Laptop Price Finder</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .subtitle {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            margin-top: 10px;
+            font-weight: 600;
+        }
+
+        .status-connected {
+            background: #10b981;
+            color: white;
+        }
+
+        .status-disconnected {
+            background: #ef4444;
+            color: white;
+        }
+
+        .status-demo {
+            background: #f59e0b;
+            color: white;
+        }
+
+        .search-container {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            margin-bottom: 30px;
+        }
+
+        .search-box {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            padding: 15px 20px;
+            font-size: 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        button {
+            padding: 15px 40px;
+            font-size: 16px;
+            font-weight: 600;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .filters {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .filter-group label {
+            font-size: 14px;
+            color: #666;
+            font-weight: 600;
+        }
+
+        .filter-group select {
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: white;
+            font-size: 18px;
+        }
+
+        .spinner {
+            border: 4px solid rgba(255,255,255,0.3);
+            border-top: 4px solid white;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .results-header {
+            color: white;
+            margin-bottom: 20px;
+            font-size: 18px;
+            text-align: center;
+        }
+
+        .results-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .laptop-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            transition: transform 0.3s, box-shadow 0.3s;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .laptop-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        }
+
+        .laptop-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+            line-height: 1.4;
+        }
+
+        .laptop-price {
+            font-size: 24px;
+            font-weight: 700;
+            color: #667eea;
+            margin: 10px 0;
+        }
+
+        .laptop-seller {
+            font-size: 14px;
+            color: #888;
+            margin-bottom: 15px;
+        }
+
+        .laptop-specs {
+            font-size: 13px;
+            color: #666;
+            line-height: 1.8;
+            margin-bottom: 15px;
+            flex-grow: 1;
+        }
+
+        .spec-item {
+            margin-bottom: 5px;
+        }
+
+        .laptop-rating {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 14px;
+            color: #f59e0b;
+            margin-bottom: 10px;
+        }
+
+        .laptop-link {
+            display: inline-block;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: 600;
+            transition: transform 0.2s;
+        }
+
+        .laptop-link:hover {
+            transform: scale(1.05);
+        }
+
+        .no-results {
+            text-align: center;
+            color: white;
+            font-size: 18px;
+            padding: 40px;
+        }
+
+        .error-message {
+            background: #fee;
+            border: 2px solid #f88;
+            color: #c33;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .error-message h3 {
+            margin-bottom: 10px;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2em;
+            }
+
+            .search-box {
+                flex-direction: column;
+            }
+
+            .results-container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🔍 AI Laptop Price Finder</h1>
+            <p class="subtitle">Find the best laptop deals across the web</p>
+            <div id="statusBadge" class="status-badge status-demo">⚙️ Checking connection...</div>
+        </header>
+
+        <div class="search-container">
+            <div class="search-box">
+                <input 
+                    type="text" 
+                    id="searchInput" 
+                    placeholder="Search for laptops (e.g., Dell XPS 13, gaming laptop, MacBook Pro)"
+                    onkeypress="if(event.key==='Enter') searchLaptops()"
+                >
+                <button onclick="searchLaptops()" id="searchBtn">Search</button>
+            </div>
+
+            <div class="filters">
+                <div class="filter-group">
+                    <label>Sort By</label>
+                    <select id="sortBy" onchange="applyFilters()">
+                        <option value="relevance">Relevance</option>
+                        <option value="price-low">Price: Low to High</option>
+                        <option value="price-high">Price: High to Low</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Brand</label>
+                    <select id="brandFilter" onchange="applyFilters()">
+                        <option value="all">All Brands</option>
+                        <option value="dell">Dell</option>
+                        <option value="hp">HP</option>
+                        <option value="lenovo">Lenovo</option>
+                        <option value="apple">Apple</option>
+                        <option value="asus">ASUS</option>
+                        <option value="acer">Acer</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div id="resultsArea"></div>
+    </div>
+
+    <script>
+        // Configuration - Change this to your Flask server URL
+        const API_URL = 'http://localhost:5000';
+        
+        let allResults = [];
+        let isConnected = false;
+
+        // Check backend connection on page load
+        async function checkConnection() {
+            try {
+                const response = await fetch(`${API_URL}/api/health`, {
+                    method: 'GET',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                
+                if (response.ok) {
+                    isConnected = true;
+                    updateStatusBadge('connected');
+                } else {
+                    updateStatusBadge('disconnected');
+                }
+            } catch (error) {
+                updateStatusBadge('disconnected');
+            }
+        }
+
+        function updateStatusBadge(status) {
+            const badge = document.getElementById('statusBadge');
+            
+            if (status === 'connected') {
+                badge.className = 'status-badge status-connected';
+                badge.textContent = '✓ Connected to Flask Backend';
+            } else if (status === 'demo') {
+                badge.className = 'status-badge status-demo';
+                badge.textContent = '⚙️ Demo Mode';
+            } else {
+                badge.className = 'status-badge status-disconnected';
+                badge.textContent = '✗ Backend Not Running';
+            }
+        }
+
+        async function searchLaptops() {
+            const query = document.getElementById('searchInput').value.trim();
+            if (!query) {
+                alert('Please enter a search term');
+                return;
+            }
+
+            const resultsArea = document.getElementById('resultsArea');
+            const searchBtn = document.getElementById('searchBtn');
+            
+            searchBtn.disabled = true;
+            resultsArea.innerHTML = '<div class="loading"><div class="spinner"></div><p>Searching for laptops...</p></div>';
+
+            try {
+                const response = await fetch(`${API_URL}/api/search?q=${encodeURIComponent(query)}`, {
+                    method: 'GET',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Server error: ${response.status}`);
+                }
+
+                const data = await response.json();
+                
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+
+                allResults = data.results || [];
+                
+                // Update status badge if in demo mode
+                if (data.mode === 'demo') {
+                    updateStatusBadge('demo');
+                }
+                
+                displayResults(allResults);
+
+            } catch (error) {
+                console.error('Search error:', error);
+                resultsArea.innerHTML = `
+                    <div class="error-message">
+                        <h3>⚠️ Connection Error</h3>
+                        <p><strong>Error:</strong> ${error.message}</p>
+                        <p>Make sure your Flask backend is running at ${API_URL}</p>
+                        <p><strong>To start the backend:</strong></p>
+                        <ol style="margin-left: 20px; margin-top: 10px;">
+                            <li>Install dependencies: <code>pip install flask flask-cors requests beautifulsoup4</code></li>
+                            <li>Run the server: <code>python app.py</code></li>
+                        </ol>
+                    </div>
+                `;
+                updateStatusBadge('disconnected');
+            } finally {
+                searchBtn.disabled = false;
+            }
+        }
+
+        function displayResults(results) {
+            const resultsArea = document.getElementById('resultsArea');
+            
+            if (results.length === 0) {
+                resultsArea.innerHTML = '<div class="no-results">No laptop listings found. Try a different search term.</div>';
+                return;
+            }
+
+            const headerHTML = `<div class="results-header">Found ${results.length} results</div>`;
+            
+            const cardsHTML = results.map(laptop => {
+                const ratingHTML = laptop.rating ? 
+                    `<div class="laptop-rating">⭐ ${laptop.rating}/5</div>` : '';
+                
+                const specsHTML = laptop.specs && laptop.specs.length > 0 ?
+                    laptop.specs.map(spec => `<div class="spec-item">• ${spec}</div>`).join('') :
+                    `<div class="spec-item">${laptop.description || 'See product page for details'}</div>`;
+
+                return `
+                    <div class="laptop-card">
+                        <div class="laptop-title">${laptop.title}</div>
+                        <div class="laptop-price">${laptop.price}</div>
+                        ${ratingHTML}
+                        <div class="laptop-seller">From: ${laptop.seller}</div>
+                        <div class="laptop-specs">${specsHTML}</div>
+                        <a href="${laptop.url}" target="_blank" rel="noopener noreferrer" class="laptop-link">View Deal →</a>
+                    </div>
+                `;
+            }).join('');
+
+            resultsArea.innerHTML = headerHTML + `<div class="results-container">${cardsHTML}</div>`;
+        }
+
+        function applyFilters() {
+            if (allResults.length === 0) return;
+
+            const sortBy = document.getElementById('sortBy').value;
+            const brandFilter = document.getElementById('brandFilter').value;
+
+            let filteredResults = [...allResults];
+            
+            // Filter by brand
+            if (brandFilter !== 'all') {
+                filteredResults = filteredResults.filter(r => 
+                    r.title.toLowerCase().includes(brandFilter) ||
+                    r.seller.toLowerCase().includes(brandFilter)
+                );
+            }
+
+            // Sort results
+            if (sortBy === 'price-low' || sortBy === 'price-high') {
+                filteredResults.sort((a, b) => {
+                    const priceA = parsePriceValue(a.price);
+                    const priceB = parsePriceValue(b.price);
+                    return sortBy === 'price-low' ? priceA - priceB : priceB - priceA;
+                });
+            }
+
+            displayResults(filteredResults);
+        }
+
+        function parsePriceValue(priceStr) {
+            if (!priceStr) return 0;
+            return parseFloat(priceStr.replace(/[^0-9.]/g, ''));
+        }
+
+        // Check connection on page load
+        window.addEventListener('load', checkConnection);
+    </script>
+</body>
+</html>
