@@ -1,1 +1,1 @@
-# AI-laptop-proce-comparison-website
+# AI-laptop-price-comparison-website
