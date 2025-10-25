@@ -291,9 +291,9 @@
 <body>
     <div class="container">
         <header>
-            <h1>🔍 AI Laptop Price Finder</h1>
+            <h1>AI Laptop Price Finder</h1>
             <p class="subtitle">Find the best laptop deals across the web</p>
-            <div id="statusBadge" class="status-badge status-demo">⚙️ Checking connection...</div>
+            <div id="statusBadge" class="status-badge status-demo">Checking connection...</div>
         </header>
 
         <div class="search-container">
@@ -365,10 +365,10 @@
             
             if (status === 'connected') {
                 badge.className = 'status-badge status-connected';
-                badge.textContent = '✓ Connected to Flask Backend';
+                badge.textContent = 'Connected to Flask Backend';
             } else if (status === 'demo') {
                 badge.className = 'status-badge status-demo';
-                badge.textContent = '⚙️ Demo Mode';
+                badge.textContent = 'Demo Mode';
             } else {
                 badge.className = 'status-badge status-disconnected';
                 badge.textContent = '✗ Backend Not Running';
@@ -417,7 +417,7 @@
                 console.error('Search error:', error);
                 resultsArea.innerHTML = `
                     <div class="error-message">
-                        <h3>⚠️ Connection Error</h3>
+                        <h3>Connection Error</h3>
                         <p><strong>Error:</strong> ${error.message}</p>
                         <p>Make sure your Flask backend is running at ${API_URL}</p>
                         <p><strong>To start the backend:</strong></p>
